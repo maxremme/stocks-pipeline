@@ -23,7 +23,7 @@ def get_data(worksheet):
     Returns:
         Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
     """
-    gc = gspread.service_account(credentials)
+    gc = gspread.service_account(st.secrets["gcp_service_account"])
 
     sh = gc.open(worksheet)
 
