@@ -5,11 +5,13 @@ import plotly.express as px
 import plotly.graph_objects as go
 from google.oauth2 import service_account
 
+credentials_dict = st.secrets["gcp_service_account"]
 # Create a connection object.
 credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"],
+    credentials_dict,
     scopes=[
         "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive",
     ],
 )
 
@@ -23,7 +25,7 @@ def get_data(worksheet):
     Returns:
         Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
     """
-    gc = gspread.service_account_from_dict(credentials)
+    gc = gspread.Client(auth=credentials)
 
     sh = gc.open(worksheet)
 
