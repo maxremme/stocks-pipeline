@@ -22,9 +22,8 @@ def run_query(query):
     return rows
 
 
-sheet_url = st.secrets["private_gsheets_url"]
-worksheet_name = "Stock"
-query = f'SELECT * FROM "{worksheet_name}"'
+sheet_url = "https://docs.google.com/spreadsheets/d/1zXHhwz1xYaiuy09QSGTb0TMVnR0Cg3Gv83h2DTOcfXc/edit#gid=0"
+query = f'SELECT * FROM "{sheet_url}"'
 rows = run_query(query)
 data = pd.DataFrame(rows, columns=rows[0])
 data = data[1:]
