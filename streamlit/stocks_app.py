@@ -6,12 +6,8 @@ import plotly.graph_objects as go
 from google.oauth2 import service_account
 
 # Create a connection object.
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"],
-    scopes=[
-        "https://www.googleapis.com/auth/spreadsheets",
-    ],
-)
+filename = st.secrets["gcp_service_account"]
+scopes = "https://www.googleapis.com/auth/spreadsheets"
 
 
 def get_data(worksheet):
@@ -23,7 +19,9 @@ def get_data(worksheet):
     Returns:
         Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
     """
-    gc = gspread.service_account(st.secrets["gcp_service_account"])
+    gc = gspread.service_account(
+        filename=st.secrets["gcp_service_account"], scopes=scopes
+    )
 
     sh = gc.open(worksheet)
 
