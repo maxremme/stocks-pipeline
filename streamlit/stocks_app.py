@@ -1,9 +1,9 @@
+import gspread
 import pandas as pd
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 from google.oauth2 import service_account
-from gsheetsdb import connect
 
 # Create a connection object.
 credentials = service_account.Credentials.from_service_account_info(
@@ -12,132 +12,143 @@ credentials = service_account.Credentials.from_service_account_info(
         "https://www.googleapis.com/auth/spreadsheets",
     ],
 )
-conn = connect(credentials=credentials)
 
 
-@st.cache_data(ttl=600)
-def run_query(query):
-    rows = conn.execute(query, headers=1)
-    rows = rows.fetchall()
-    return rows
+def get_data(worksheet):
+    """Gets all Values from a Google Spreadsheet.
+
+    Args:
+        worksheet (str): Name of the Google Spreadsheet.
+
+    Returns:
+        Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
+    """
+    gc = gspread.service_account(credentials)
+
+    sh = gc.open(worksheet)
+
+    wks = sh.worksheet("Sheet1")
+
+    data = wks.get_all_values()
+
+    df = pd.DataFrame(data[1:], columns=data[0])
+
+    return df
 
 
-sheet_url = "https://docs.google.com/spreadsheets/d/1zXHhwz1xYaiuy09QSGTb0TMVnR0Cg3Gv83h2DTOcfXc/edit#gid=0"
-query = f'SELECT * FROM "{sheet_url}"'
-rows = run_query(query)
-
-# data = pd.DataFrame(rows, columns=rows[0])
-# data = data[1:]
+data = get_data("Stock")
 
 
-# # Define functions for calculating and plotting Bollinger Bands
-# def calculate_bollinger_bands(data, window=20, num_std_dev=2):
-#     data["rolling_mean"] = data["fClose"].rolling(window=window).mean()
-#     data["upper_band"] = data["rolling_mean"] + (
-#         data["fClose"].rolling(window=window).std() * num_std_dev
-#     )
-#     data["lower_band"] = data["rolling_mean"] - (
-#         data["fClose"].rolling(window=window).std() * num_std_dev
-#     )
-#     return data
+# Define functions for calculating and plotting Bollinger Bands
+def calculate_bollinger_bands(data, window=20, num_std_dev=2):
+    data["rolling_mean"] = data["fClose"].rolling(window=window).mean()
+    data["upper_band"] = data["rolling_mean"] + (
+        data["fClose"].rolling(window=window).std() * num_std_dev
+    )
+    data["lower_band"] = data["rolling_mean"] - (
+        data["fClose"].rolling(window=window).std() * num_std_dev
+    )
+    return data
 
 
-# def plot_bollinger_bands(data, symbol):
-#     data = calculate_bollinger_bands(data)
-#     return data
+def plot_bollinger_bands(data, symbol):
+    data = calculate_bollinger_bands(data)
+    return data
 
 
-# st.title("Stock Price Analysis")
+data = get_data("Stock")
 
-# symbols = data["Symbol"].unique()
-# selected_symbol = st.sidebar.selectbox("Select Stock Symbol", symbols)
+st.title("Stock Price Analysis")
 
-# # Filter the DataFrame based on the selected stock symbol
-# filtered_df = data[data["Symbol"] == selected_symbol]
+symbols = data["Symbol"].unique()
+selected_symbol = st.sidebar.selectbox("Select Stock Symbol", symbols)
 
-# # Create interactive visualizations
+# Filter the DataFrame based on the selected stock symbol
+filtered_df = data[data["Symbol"] == selected_symbol]
 
-# # Line chart for stock prices over time
-# fig1 = px.line(
-#     filtered_df, x="Date", y="fClose", title=f"{selected_symbol} Stock Prices Over Time"
-# )
-# st.plotly_chart(fig1)
+# Create interactive visualizations
 
-# # Bar chart for daily trading volume
-# fig2 = px.bar(
-#     filtered_df, x="Date", y="fVolume", title=f"{selected_symbol} Daily Trading Volume"
-# )
-# st.plotly_chart(fig2)
+# Line chart for stock prices over time
+fig1 = px.line(
+    filtered_df, x="Date", y="fClose", title=f"{selected_symbol} Stock Prices Over Time"
+)
+st.plotly_chart(fig1)
 
-# # Calculate and plot Bollinger Bands for the selected stock symbol
-# if "upper_band" not in filtered_df.columns:
-#     filtered_df = plot_bollinger_bands(filtered_df, selected_symbol)
+# Bar chart for daily trading volume
+fig2 = px.bar(
+    filtered_df, x="Date", y="fVolume", title=f"{selected_symbol} Daily Trading Volume"
+)
+st.plotly_chart(fig2)
 
-#     # Line chart for Bollinger Bands
-#     fig3 = go.Figure()
+# Calculate and plot Bollinger Bands for the selected stock symbol
+if "upper_band" not in filtered_df.columns:
+    filtered_df = plot_bollinger_bands(filtered_df, selected_symbol)
 
-#     # Add the stock price line
-#     fig3.add_trace(
-#         go.Scatter(
-#             x=filtered_df["Date"],
-#             y=filtered_df["fClose"],
-#             mode="lines",
-#             name=f"{selected_symbol} Price",
-#         )
-#     )
+    # Line chart for Bollinger Bands
+    fig3 = go.Figure()
 
-#     # Add the upper and lower Bollinger Bands
-#     fig3.add_trace(
-#         go.Scatter(
-#             x=filtered_df["Date"],
-#             y=filtered_df["upper_band"],
-#             mode="lines",
-#             line=dict(dash="dash"),
-#             name="Upper Bollinger Band",
-#         )
-#     )
+    # Add the stock price line
+    fig3.add_trace(
+        go.Scatter(
+            x=filtered_df["Date"],
+            y=filtered_df["fClose"],
+            mode="lines",
+            name=f"{selected_symbol} Price",
+        )
+    )
 
-#     fig3.add_trace(
-#         go.Scatter(
-#             x=filtered_df["Date"],
-#             y=filtered_df["lower_band"],
-#             mode="lines",
-#             line=dict(dash="dash"),
-#             name="Lower Bollinger Band",
-#         )
-#     )
+    # Add the upper and lower Bollinger Bands
+    fig3.add_trace(
+        go.Scatter(
+            x=filtered_df["Date"],
+            y=filtered_df["upper_band"],
+            mode="lines",
+            line=dict(dash="dash"),
+            name="Upper Bollinger Band",
+        )
+    )
 
-#     fig3.update_layout(
-#         title=f"{selected_symbol} Bollinger Bands",
-#         xaxis_title="Date",
-#         yaxis_title="Price",
-#     )
-#     st.plotly_chart(fig3)
+    fig3.add_trace(
+        go.Scatter(
+            x=filtered_df["Date"],
+            y=filtered_df["lower_band"],
+            mode="lines",
+            line=dict(dash="dash"),
+            name="Lower Bollinger Band",
+        )
+    )
 
-# # Scatter plot for high vs. low prices
-# fig4 = px.scatter(
-#     filtered_df, x="fHigh", y="fLow", title=f"{selected_symbol} High vs. Low Prices"
-# )
-# st.plotly_chart(fig4)
+    fig3.update_layout(
+        title=f"{selected_symbol} Bollinger Bands",
+        xaxis_title="Date",
+        yaxis_title="Price",
+    )
+    st.plotly_chart(fig3)
 
-# # Add a section for comparing multiple stocks
+# Scatter plot for high vs. low prices
+fig4 = px.scatter(
+    filtered_df, x="fHigh", y="fLow", title=f"{selected_symbol} High vs. Low Prices"
+)
+st.plotly_chart(fig4)
 
-# # Add a sidebar to allow users to select multiple stock symbols
-# st.sidebar.markdown("## Compare Stocks")
-# selected_symbols_to_compare = st.sidebar.multiselect(
-#     "Select Stock Symbols to Compare", symbols
-# )
+# Add a section for comparing multiple stocks
 
-# # Filter the DataFrame for selected symbols to compare
-# filtered_df_compare = data[data["Symbol"].isin(selected_symbols_to_compare)]
+# Add a sidebar to allow users to select multiple stock symbols
+st.sidebar.markdown("## Compare Stocks")
+selected_symbols_to_compare = st.sidebar.multiselect(
+    "Select Stock Symbols to Compare", symbols
+)
 
-# # Create an interactive line chart to overlay stock prices for comparison
-# if selected_symbols_to_compare:
-#     fig5 = px.line(
-#         filtered_df_compare,
-#         x="Date",
-#         y="fClose",
-#         color="Symbol",
-#         title="Stock Price Comparison",
-#     )
-#     st.plotly_chart(fig5)
+# Filter the DataFrame for selected symbols to compare
+filtered_df_compare = data[data["Symbol"].isin(selected_symbols_to_compare)]
+
+# Create an interactive line chart to overlay stock prices for comparison
+if selected_symbols_to_compare:
+    fig5 = px.line(
+        filtered_df_compare,
+        x="Date",
+        y="fClose",
+        color="Symbol",
+        title="Stock Price Comparison",
+    )
+    st.plotly_chart(fig5)
