@@ -67,8 +67,6 @@ def plot_bollinger_bands(data, symbol):
     return data
 
 
-data = get_data("Stock")
-
 st.title("Stock Price Analysis")
 
 symbols = data["Symbol"].unique()
