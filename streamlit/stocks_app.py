@@ -1,4 +1,3 @@
-import gspread
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -16,26 +15,26 @@ credentials = service_account.Credentials.from_service_account_info(
 conn = connect(credentials=credentials)
 
 
-def get_data(worksheet):
-    """Gets all Values from a Google Spreadsheet.
+# def get_data(worksheet):
+#     """Gets all Values from a Google Spreadsheet.
 
-    Args:
-        worksheet (str): Name of the Google Spreadsheet.
+#     Args:
+#         worksheet (str): Name of the Google Spreadsheet.
 
-    Returns:
-        Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
-    """
-    gc = gspread.service_account(filename="../service_account/service_account.json")
+#     Returns:
+#         Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
+#     """
+#     gc = gspread.service_account(filename="../service_account/service_account.json")
 
-    sh = gc.open(worksheet)
+#     sh = gc.open(worksheet)
 
-    wks = sh.worksheet("Sheet1")
+#     wks = sh.worksheet("Sheet1")
 
-    data = wks.get_all_values()
+#     data = wks.get_all_values()
 
-    df = pd.DataFrame(data[1:], columns=data[0])
+#     df = pd.DataFrame(data[1:], columns=data[0])
 
-    return df
+#     return df
 
 
 @st.cache_data(ttl=600)
@@ -47,12 +46,8 @@ def run_query(query):
 
 sheet_url = st.secrets["private_gsheets_url"]
 rows = run_query(f'SELECT * FROM "{sheet_url}"')
-
-row_list = []
-for row in rows:
-    row_list.append(row)
-
-data = pd.DataFrame(row_list)
+data = pd.DataFrame(rows, columns=rows[0])
+data = data[1:]
 
 
 # Define functions for calculating and plotting Bollinger Bands
