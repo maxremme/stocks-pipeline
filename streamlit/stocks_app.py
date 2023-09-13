@@ -1,11 +1,17 @@
 import gspread
 import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
-import numpy as np
+from google.oauth2 import service_account
+import json
+import os
+
+
+credentials_info = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+
+
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
 
 def get_data(worksheet):
@@ -17,7 +23,7 @@ def get_data(worksheet):
     Returns:
         Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
     """
-    gc = gspread.service_account(filename="../service_account/service_account.json")
+    gc = gspread.service_account(credentials)
 
     sh = gc.open(worksheet)
 
