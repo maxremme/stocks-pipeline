@@ -15,28 +15,6 @@ credentials = service_account.Credentials.from_service_account_info(
 conn = connect(credentials=credentials)
 
 
-# def get_data(worksheet):
-#     """Gets all Values from a Google Spreadsheet.
-
-#     Args:
-#         worksheet (str): Name of the Google Spreadsheet.
-
-#     Returns:
-#         Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
-#     """
-#     gc = gspread.service_account(filename="../service_account/service_account.json")
-
-#     sh = gc.open(worksheet)
-
-#     wks = sh.worksheet("Sheet1")
-
-#     data = wks.get_all_values()
-
-#     df = pd.DataFrame(data[1:], columns=data[0])
-
-#     return df
-
-
 @st.cache_data(ttl=600)
 def run_query(query):
     rows = conn.execute(query, headers=1)
@@ -45,7 +23,9 @@ def run_query(query):
 
 
 sheet_url = st.secrets["private_gsheets_url"]
-rows = run_query(f'SELECT * FROM "{sheet_url}"')
+worksheet_name = "Stock"
+query = f'SELECT * FROM "{worksheet_name}"'
+rows = run_query(query)
 data = pd.DataFrame(rows, columns=rows[0])
 data = data[1:]
 
