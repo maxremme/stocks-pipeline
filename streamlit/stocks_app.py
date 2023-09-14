@@ -36,7 +36,7 @@ def get_data():
 
     df = pd.DataFrame(data[1:], columns=data[0])
 
-    return df.sort_values("Date")
+    return df
 
 
 # Define functions for calculating and plotting Bollinger Bands
@@ -57,6 +57,7 @@ def plot_bollinger_bands(data, symbol):
 
 
 data = get_data()
+data = data.sort_values("Date")
 
 st.title("Stock Price Analysis")
 
