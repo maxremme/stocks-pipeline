@@ -51,13 +51,16 @@ The Streamlit frontend offers various interactive graphs to analyze stock data:
 
 To view the app, follow the link https://maxwells-stock-analysis.streamlit.app/
 
-#### License
+## Licensing
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-#### Acknowledgments
+### Data Attribution
 
-    Mention any libraries, frameworks, or APIs used.
-    Give credit to any contributors or sources of inspiration.
+The data displayed in this project is sourced from the IEX API.
 
-Feel free to expand on each section with more details, code snippets, and usage instructions as needed. This outline provides a structure for your README.txt to effectively convey the purpose and functionality of your project.
+- **Data Source**: [IEX Cloud](https://iexcloud.io)
+- **Data Terms of Use**: [IEX Cloud Terms of Service](https://iexcloud.io/terms/)
+
+When using or referencing this project's data, please adhere to the data provider's terms of use and attribution requirements as specified in their terms of service.
+
