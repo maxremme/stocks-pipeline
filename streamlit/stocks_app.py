@@ -16,7 +16,7 @@ credentials = service_account.Credentials.from_service_account_info(
 )
 
 
-def get_data(worksheet):
+def get_data():
     """Gets all Values from a Google Spreadsheet.
 
     Args:
@@ -25,9 +25,10 @@ def get_data(worksheet):
     Returns:
         Pandas DataFrame: Returns a dataframe with all values from  the spreadsheet.
     """
+
     gc = gspread.Client(auth=credentials)
 
-    sh = gc.open(worksheet)
+    sh = gc.open("Stock")
 
     wks = sh.worksheet("Sheet1")
 
@@ -35,10 +36,7 @@ def get_data(worksheet):
 
     df = pd.DataFrame(data[1:], columns=data[0])
 
-    return df
-
-
-data = get_data("Stock")
+    return df.sort_values("Date")
 
 
 # Define functions for calculating and plotting Bollinger Bands
@@ -58,7 +56,7 @@ def plot_bollinger_bands(data, symbol):
     return data
 
 
-data = get_data("Stock")
+data = get_data()
 
 st.title("Stock Price Analysis")
 
