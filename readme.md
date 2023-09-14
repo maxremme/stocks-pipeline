@@ -53,7 +53,7 @@ To view the app, follow the link https://maxwells-stock-analysis.streamlit.app/
 
 ## Licensing
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ### Data Attribution
 
