@@ -15,58 +15,6 @@ credentials = service_account.Credentials.from_service_account_info(
     ],
 )
 
-st.markdown(
-    """
-    <style>
-    /* Custom CSS rules */
-    
-    /* Body background color */
-    body {
-        background-color: #f9f9f9;
-    }
-
-    /* Sidebar style */
-    .sidebar .sidebar-content {
-        background-color: #333;
-        color: white;
-    }
-    
-    /* Sidebar header style */
-    .sidebar .stSidebar .css-1abwxz9 {
-        background-color: #222;
-    }
-
-    /* Header text color */
-    .css-1q6091i {
-        color: #333 !important;
-    }
-
-    /* Section header style */
-    .css-1rv7c1w {
-        background-color: #f3f3f3;
-        padding: 10px;
-        border-radius: 5px;
-    }
-    
-    /* Section description style */
-    .css-1xl4xev {
-        margin-top: 10px;
-        margin-bottom: 20px;
-        font-size: 16px;
-    }
-
-    /* Plotly chart container style */
-    .stPlotly {
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 5px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 
 def get_data():
     """Gets all Values from a Google Spreadsheet.
@@ -225,3 +173,21 @@ if selected_symbols_to_compare:
         title="Stock Price Comparison",
     )
     st.plotly_chart(fig5)
+
+if st.sidebar.button("Download CSV"):
+    # Define the file name
+    csv_file_name = f"{selected_symbol}_data.csv"
+
+    # Create a CSV string from the current selected output (filtered_df)
+    csv_data = filtered_df.to_csv(index=False)
+
+    # Use the download_button to trigger the download
+    st.sidebar.download_button(
+        label="Click here to download",
+        data=csv_data.encode(),
+        key="csv_data",
+        file_name=csv_file_name,
+    )
+
+# Add an explanation for what will be downloaded
+st.sidebar.markdown("Download the data for the currently selected stock as a CSV file.")
