@@ -15,6 +15,58 @@ credentials = service_account.Credentials.from_service_account_info(
     ],
 )
 
+st.markdown(
+    """
+    <style>
+    /* Custom CSS rules */
+    
+    /* Body background color */
+    body {
+        background-color: #f9f9f9;
+    }
+
+    /* Sidebar style */
+    .sidebar .sidebar-content {
+        background-color: #333;
+        color: white;
+    }
+    
+    /* Sidebar header style */
+    .sidebar .stSidebar .css-1abwxz9 {
+        background-color: #222;
+    }
+
+    /* Header text color */
+    .css-1q6091i {
+        color: #333 !important;
+    }
+
+    /* Section header style */
+    .css-1rv7c1w {
+        background-color: #f3f3f3;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+    /* Section description style */
+    .css-1xl4xev {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        font-size: 16px;
+    }
+
+    /* Plotly chart container style */
+    .stPlotly {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 def get_data():
     """Gets all Values from a Google Spreadsheet.
@@ -59,7 +111,13 @@ def plot_bollinger_bands(data, symbol):
 data = get_data()
 data = data.sort_values("Date")
 
-st.title("Stock Price Analysis")
+st.title("Stock Price Visualization")
+
+st.write(
+    "Welcome to Maxwells Stock Price Visualization app! This app allows you to explore and visualize stock price data. "
+    "You can select a stock symbol from the sidebar to view its historical prices, trading volume, Bollinger Bands, "
+    "and compare multiple stocks. Updated daily."
+)
 
 symbols = data["Symbol"].unique()
 selected_symbol = st.sidebar.selectbox("Select Stock Symbol", symbols)
@@ -68,13 +126,18 @@ selected_symbol = st.sidebar.selectbox("Select Stock Symbol", symbols)
 filtered_df = data[data["Symbol"] == selected_symbol]
 
 # Create interactive visualizations
-
+st.header("Stock Prices Over Time")
+st.write("Historical closing prices of the selected stock over time.")
 # Line chart for stock prices over time
 fig1 = px.line(
     filtered_df, x="Date", y="fClose", title=f"{selected_symbol} Stock Prices Over Time"
 )
 st.plotly_chart(fig1)
 
+st.header("Daily Trading Volume")
+st.write(
+    "Daily trading volume for the selected stock, helps identify patterns in trading activity."
+)
 # Bar chart for daily trading volume
 fig2 = px.bar(
     filtered_df, x="Date", y="fVolume", title=f"{selected_symbol} Daily Trading Volume"
@@ -84,6 +147,11 @@ st.plotly_chart(fig2)
 # Calculate and plot Bollinger Bands for the selected stock symbol
 if "upper_band" not in filtered_df.columns:
     filtered_df = plot_bollinger_bands(filtered_df, selected_symbol)
+
+    st.header("Bollinger Bands")
+    st.write(
+        "Bollinger Bands are used to visualize the volatility and potential price reversal points for the selected stock."
+    )
 
     # Line chart for Bollinger Bands
     fig3 = go.Figure()
@@ -126,6 +194,10 @@ if "upper_band" not in filtered_df.columns:
     )
     st.plotly_chart(fig3)
 
+st.header("High vs. Low Prices")
+st.write(
+    "This scatter plot shows the relationship between daily high and low prices of the selected stock."
+)
 # Scatter plot for high vs. low prices
 fig4 = px.scatter(
     filtered_df, x="fHigh", y="fLow", title=f"{selected_symbol} High vs. Low Prices"
