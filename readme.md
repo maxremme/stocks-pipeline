@@ -5,6 +5,11 @@ This project implements a data pipeline for retrieving stock information from th
 storing it in Google Sheets, and visualizing it using a Streamlit cloud frontend. 
 The pipeline consists of three main components: two AWS Lambda functions and a Streamlit web application.
 
+⚠️ **Deprecated Warning:** ⚠️
+
+This project is no longer actively maintained.🚀
+
+
 ### Components
 #### 1. Initial Data Retrieval
 
