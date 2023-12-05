@@ -28,7 +28,7 @@ def get_data():
 
     gc = gspread.Client(auth=credentials)
 
-    sh = gc.open("Stock")
+    sh = gc.open("stocks_new")
 
     wks = sh.worksheet("Sheet1")
 
