@@ -78,7 +78,10 @@ st.header("Stock Prices Over Time")
 st.write("Historical closing prices of the selected stock over time.")
 # Line chart for stock prices over time
 fig1 = px.line(
-    filtered_df, x="Date", y="Close", title=f"{selected_symbol} Stock Prices Over Time"
+    filtered_df,
+    x="Date",
+    y="Previous Close",
+    title=f"{selected_symbol} Stock Prices Over Time",
 )
 st.plotly_chart(fig1)
 
@@ -108,7 +111,7 @@ if "upper_band" not in filtered_df.columns:
     fig3.add_trace(
         go.Scatter(
             x=filtered_df["Date"],
-            y=filtered_df["Close"],
+            y=filtered_df["Previous Close"],
             mode="lines",
             name=f"{selected_symbol} Price",
         )
@@ -168,7 +171,7 @@ if selected_symbols_to_compare:
     fig5 = px.line(
         filtered_df_compare,
         x="Date",
-        y="Close",
+        y="Previous Close",
         color="Symbol",
         title="Stock Price Comparison",
     )
