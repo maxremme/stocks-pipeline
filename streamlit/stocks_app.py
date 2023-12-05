@@ -41,12 +41,12 @@ def get_data():
 
 # Define functions for calculating and plotting Bollinger Bands
 def calculate_bollinger_bands(data, window=20, num_std_dev=2):
-    data["rolling_mean"] = data["Close"].rolling(window=window).mean()
+    data["rolling_mean"] = data["Previous Close"].rolling(window=window).mean()
     data["upper_band"] = data["rolling_mean"] + (
-        data["Close"].rolling(window=window).std() * num_std_dev
+        data["Previous Close"].rolling(window=window).std() * num_std_dev
     )
     data["lower_band"] = data["rolling_mean"] - (
-        data["Close"].rolling(window=window).std() * num_std_dev
+        data["Previous Close"].rolling(window=window).std() * num_std_dev
     )
     return data
 
