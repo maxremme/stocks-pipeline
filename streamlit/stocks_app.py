@@ -41,12 +41,12 @@ def get_data():
 
 # Define functions for calculating and plotting Bollinger Bands
 def calculate_bollinger_bands(data, window=20, num_std_dev=2):
-    data["rolling_mean"] = data["fClose"].rolling(window=window).mean()
+    data["rolling_mean"] = data["Close"].rolling(window=window).mean()
     data["upper_band"] = data["rolling_mean"] + (
-        data["fClose"].rolling(window=window).std() * num_std_dev
+        data["Close"].rolling(window=window).std() * num_std_dev
     )
     data["lower_band"] = data["rolling_mean"] - (
-        data["fClose"].rolling(window=window).std() * num_std_dev
+        data["Close"].rolling(window=window).std() * num_std_dev
     )
     return data
 
@@ -78,7 +78,7 @@ st.header("Stock Prices Over Time")
 st.write("Historical closing prices of the selected stock over time.")
 # Line chart for stock prices over time
 fig1 = px.line(
-    filtered_df, x="Date", y="fClose", title=f"{selected_symbol} Stock Prices Over Time"
+    filtered_df, x="Date", y="Close", title=f"{selected_symbol} Stock Prices Over Time"
 )
 st.plotly_chart(fig1)
 
@@ -88,7 +88,7 @@ st.write(
 )
 # Bar chart for daily trading volume
 fig2 = px.bar(
-    filtered_df, x="Date", y="fVolume", title=f"{selected_symbol} Daily Trading Volume"
+    filtered_df, x="Date", y="Volume", title=f"{selected_symbol} Daily Trading Volume"
 )
 st.plotly_chart(fig2)
 
@@ -108,7 +108,7 @@ if "upper_band" not in filtered_df.columns:
     fig3.add_trace(
         go.Scatter(
             x=filtered_df["Date"],
-            y=filtered_df["fClose"],
+            y=filtered_df["Close"],
             mode="lines",
             name=f"{selected_symbol} Price",
         )
@@ -148,7 +148,7 @@ st.write(
 )
 # Scatter plot for high vs. low prices
 fig4 = px.scatter(
-    filtered_df, x="fHigh", y="fLow", title=f"{selected_symbol} High vs. Low Prices"
+    filtered_df, x="High", y="Low", title=f"{selected_symbol} High vs. Low Prices"
 )
 st.plotly_chart(fig4)
 
@@ -168,7 +168,7 @@ if selected_symbols_to_compare:
     fig5 = px.line(
         filtered_df_compare,
         x="Date",
-        y="fClose",
+        y="Close",
         color="Symbol",
         title="Stock Price Comparison",
     )
