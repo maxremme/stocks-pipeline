@@ -62,9 +62,9 @@ data = data.sort_values("Date")
 st.title("Stock Price Visualization")
 
 st.write(
-    "Welcome to Maxwells Stock Price Visualization app! This app allows you to explore and visualize stock price data. "
+    "Welcome to the Stock Price Visualization app! This app allows you to explore and visualize stock price data. "
     "You can select a stock symbol from the sidebar to view its historical prices, trading volume, Bollinger Bands, "
-    "and compare multiple stocks. Updated daily."
+    "and compare multiple stocks. Updated daily at 04:00 UTC."
 )
 
 symbols = data["Symbol"].unique()
