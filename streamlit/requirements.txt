@@ -1,4 +1,4 @@
-aiohttp==3.8.5
+aiohttp==3.10.2
 blinker==1.6.2
 brotlicffi==1.0.9.2
 brotlipy==0.7.0
