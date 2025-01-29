@@ -1,23 +1,18 @@
 # Data Pipeline Project: Stock Information Retrieval and Visualization
 ## Overview
 
-This project implements a data pipeline for retrieving stock information from the IEX API, 
+This project implements a data pipeline for retrieving stock information from Google, 
 storing it in Google Sheets, and visualizing it using a Streamlit cloud frontend. 
-The pipeline consists of three main components: two AWS Lambda functions and a Streamlit web application.
-
-⚠️ **Deprecated Warning:** ⚠️
-
-This project is no longer actively maintained.🚀
-
+The pipeline consists of four main components: two AWS Lambda functions, a Google Sheets doc and a Streamlit web application.
 
 ### Components
 #### 1. Initial Data Retrieval
 
     Function Name: main_lambda.py
     Description: This AWS Lambda function makes an initial API call to 
-    the IEX API to fetch stock information for a chosen stock, including 
+   google stock information for a chosen stock, including 
     Symbol, Date, Open, Close, High, Low, and Volume. 
-    It executes once a day at 9am CET time.
+    It executes once a day.
 
 #### 2. Data Storage and Population
 
@@ -55,17 +50,3 @@ The Streamlit frontend offers various interactive graphs to analyze stock data:
 #### Getting Started
 
 To view the app, follow the link https://maxwells-stock-analysis.streamlit.app/
-
-## Licensing
-
-This project is licensed under the MIT License.
-
-### Data Attribution
-
-The data displayed in this project is sourced from the IEX API.
-
-- **Data Source**: [IEX Cloud](https://iexcloud.io)
-- **Data Terms of Use**: [IEX Cloud Terms of Service](https://iexcloud.io/terms/)
-
-When using or referencing this project's data, please adhere to the data provider's terms of use and attribution requirements as specified in their terms of service.
-
