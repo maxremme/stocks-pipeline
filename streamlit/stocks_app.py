@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from google.oauth2 import service_account
 
 # Configure page (must be first Streamlit command)
-st.set_page_config(page_title="Stock Analytics Dashboard", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Stock Analytics Dashboard", page_icon="📊", layout="wide")
 
 credentials_dict = st.secrets["gcp_service_account"]
 # Create a connection object.
@@ -86,32 +86,26 @@ data = data.sort_values("Date")
 # Custom styling
 st.markdown("""
 <style>
-    .main {
-        background-color: #0e1117;
-    }
     .stPlotlyChart {
         background-color: #1a1d29;
-        border-radius: 10px;
-        padding: 10px;
+        border-radius: 5px;
+        padding: 5px;
     }
     h1 {
         color: #00d4ff;
-        font-size: 3em;
-        text-align: center;
-        padding: 20px 0;
+        font-size: 2em;
+        padding: 10px 0;
     }
     h2 {
         color: #00d4ff;
-        border-bottom: 2px solid #00d4ff;
-        padding-bottom: 10px;
-    }
-    .css-1d391kg {
-        padding-top: 2rem;
+        font-size: 1.3em;
+        border-bottom: 1px solid #00d4ff;
+        padding-bottom: 5px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("📈 Stock Analytics Dashboard")
+st.title("Stock Analytics Dashboard")
 
 st.write(
     "Welcome to the Stock Price Visualization app! This app allows you to explore and visualize stock price data. "
@@ -134,7 +128,7 @@ filtered_df = calculate_macd(filtered_df)
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.header("📊 Stock Price Chart")
+    st.header("Stock Price Chart")
     st.write("Historical closing prices with moving averages")
 
     # Calculate moving averages
@@ -180,7 +174,7 @@ with col1:
     st.plotly_chart(fig1, use_container_width=True)
 
 with col2:
-    st.header("📈 Key Metrics")
+    st.header("Key Metrics")
 
     # Calculate key metrics
     latest_price = filtered_df["Previous Close"].iloc[-1]
@@ -196,7 +190,7 @@ with col2:
     st.metric("52W Low", f"${low_52w:.2f}")
 
 # Candlestick Chart
-st.header("🕯️ Candlestick Chart")
+st.header("Candlestick Chart")
 st.write("OHLC (Open, High, Low, Close) candlestick chart showing detailed price movements")
 
 fig_candle = go.Figure(data=[go.Candlestick(
@@ -220,33 +214,47 @@ fig_candle.update_layout(
 st.plotly_chart(fig_candle, use_container_width=True)
 
 # Volume Chart
-st.header("📊 Trading Volume")
+st.header("Trading Volume")
 st.write("Daily trading volume with color-coded price changes")
 
 # Create volume chart with colors based on price change
-colors = ["#51cf66" if filtered_df["Previous Close"].iloc[i] >= filtered_df["Previous Close"].iloc[i-1]
-          else "#ff6b6b" for i in range(len(filtered_df))]
-colors[0] = "#51cf66"  # First bar default
+# Ensure we have valid volume data
+filtered_df_volume = filtered_df.dropna(subset=['Volume'])
 
-fig2 = go.Figure(data=[go.Bar(
-    x=filtered_df["Date"],
-    y=filtered_df["Volume"],
-    marker_color=colors,
-    name="Volume"
-)])
+if len(filtered_df_volume) > 0:
+    colors = []
+    for i in range(len(filtered_df_volume)):
+        if i == 0:
+            colors.append("#51cf66")
+        else:
+            prev_close = filtered_df_volume["Previous Close"].iloc[i-1]
+            curr_close = filtered_df_volume["Previous Close"].iloc[i]
+            if pd.notna(prev_close) and pd.notna(curr_close) and curr_close >= prev_close:
+                colors.append("#51cf66")
+            else:
+                colors.append("#ff6b6b")
 
-fig2.update_layout(
-    title=f"{selected_symbol} Daily Trading Volume",
-    xaxis_title="Date",
-    yaxis_title="Volume",
-    template="plotly_dark",
-    height=400,
-)
+    fig2 = go.Figure(data=[go.Bar(
+        x=filtered_df_volume["Date"],
+        y=filtered_df_volume["Volume"],
+        marker_color=colors,
+        name="Volume"
+    )])
 
-st.plotly_chart(fig2, use_container_width=True)
+    fig2.update_layout(
+        title=f"{selected_symbol} Daily Trading Volume",
+        xaxis_title="Date",
+        yaxis_title="Volume",
+        template="plotly_dark",
+        height=400,
+    )
 
-# Bollinger Bands - FIXED VERSION with middle band and fill
-st.header("📉 Bollinger Bands")
+    st.plotly_chart(fig2, use_container_width=True)
+else:
+    st.warning("No volume data available for this stock")
+
+# Bollinger Bands
+st.header("Bollinger Bands")
 st.write("Bollinger Bands show volatility and potential price reversal points (20-day SMA ± 2 std dev)")
 
 fig3 = go.Figure()
@@ -309,7 +317,7 @@ fig3.add_trace(go.Scatter(
 ))
 
 fig3.update_layout(
-    title=f"{selected_symbol} Bollinger Bands (FIXED)",
+    title=f"{selected_symbol} Bollinger Bands",
     xaxis_title="Date",
     yaxis_title="Price (USD)",
     template="plotly_dark",
@@ -320,7 +328,7 @@ fig3.update_layout(
 st.plotly_chart(fig3, use_container_width=True)
 
 # RSI (Relative Strength Index)
-st.header("📈 RSI - Relative Strength Index")
+st.header("RSI - Relative Strength Index")
 st.write("RSI measures momentum - values above 70 indicate overbought, below 30 indicate oversold")
 
 fig_rsi = go.Figure()
@@ -350,7 +358,7 @@ fig_rsi.update_layout(
 st.plotly_chart(fig_rsi, use_container_width=True)
 
 # MACD
-st.header("📊 MACD - Moving Average Convergence Divergence")
+st.header("MACD - Moving Average Convergence Divergence")
 st.write("MACD shows the relationship between two moving averages - useful for identifying trend changes")
 
 fig_macd = go.Figure()
@@ -394,10 +402,10 @@ st.plotly_chart(fig_macd, use_container_width=True)
 
 # Stock Comparison Section
 st.markdown("---")
-st.header("🔄 Multi-Stock Comparison")
+st.header("Multi-Stock Comparison")
 
 # Add a sidebar to allow users to select multiple stock symbols
-st.sidebar.markdown("## 🔄 Compare Stocks")
+st.sidebar.markdown("## Compare Stocks")
 selected_symbols_to_compare = st.sidebar.multiselect(
     "Select Stock Symbols to Compare", symbols
 )
@@ -470,14 +478,14 @@ if selected_symbols_to_compare:
 
         st.plotly_chart(fig6, use_container_width=True)
 else:
-    st.info("👈 Select stocks from the sidebar to compare their performance")
+    st.info("Select stocks from the sidebar to compare their performance")
 
 # Download Section
 st.sidebar.markdown("---")
-st.sidebar.markdown("## 💾 Download Data")
+st.sidebar.markdown("## Download Data")
 st.sidebar.markdown(f"Download **{selected_symbol}** data with all indicators")
 
-if st.sidebar.button("📥 Prepare Download"):
+if st.sidebar.button("Prepare Download"):
     # Define the file name
     csv_file_name = f"{selected_symbol}_data_with_indicators.csv"
 
@@ -486,16 +494,16 @@ if st.sidebar.button("📥 Prepare Download"):
 
     # Use the download_button to trigger the download
     st.sidebar.download_button(
-        label="⬇️ Download CSV",
+        label="Download CSV",
         data=csv_data.encode(),
         key="csv_data",
         file_name=csv_file_name,
         mime="text/csv",
     )
-    st.sidebar.success("✅ Ready to download!")
+    st.sidebar.success("Ready to download!")
 
 # Footer
 st.sidebar.markdown("---")
-st.sidebar.markdown("### 📊 Stock Analytics Dashboard")
+st.sidebar.markdown("### Stock Analytics Dashboard")
 st.sidebar.markdown("Updated daily at 04:00 UTC")
 st.sidebar.markdown("Built with Streamlit & Plotly")
